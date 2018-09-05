@@ -35,25 +35,19 @@ namespace MathNet.Numerics.Optimization
     {
         public double XTolerance { get; set; }
         public int MaximumIterations { get; set; }
-        public int MaximumExpansionSteps { get; set; }
-        public double LowerExpansionFactor { get; set; }
-        public double UpperExpansionFactor { get; set; }
 
-        public GoldenSectionMinimizer(double xTolerance=1e-5, int maxIterations=1000, int maxExpansionSteps=10, double lowerExpansionFactor=2.0, double upperExpansionFactor=2.0)
+        public GoldenSectionMinimizer(double xTolerance=1e-5, int maxIterations=1000)
         {
             XTolerance = xTolerance;
             MaximumIterations = maxIterations;
-            MaximumExpansionSteps = maxExpansionSteps;
-            LowerExpansionFactor = lowerExpansionFactor;
-            UpperExpansionFactor = upperExpansionFactor;
         }
 
         public ScalarMinimizationResult FindMinimum(IScalarObjectiveFunction objective, double lowerBound, double upperBound)
         {
-            return Minimum(objective, lowerBound, upperBound, XTolerance, MaximumIterations, MaximumExpansionSteps, LowerExpansionFactor, UpperExpansionFactor);
+            return Minimum(objective, lowerBound, upperBound, XTolerance, MaximumIterations);
         }
 
-        public static ScalarMinimizationResult Minimum(IScalarObjectiveFunction objective, double lowerBound, double upperBound, double xTolerance=1e-5, int maxIterations=1000, int maxExpansionSteps=10, double lowerExpansionFactor=2.0, double upperExpansionFactor=2.0)
+        public static ScalarMinimizationResult Minimum(IScalarObjectiveFunction objective, double lowerBound, double upperBound, double xTolerance=1e-5, int maxIterations=1000)
         {
             if (upperBound <= lowerBound)
             {
@@ -68,32 +62,6 @@ namespace MathNet.Numerics.Optimization
             ValueChecker(lower.Value, lowerBound);
             ValueChecker(middle.Value, middlePointX);
             ValueChecker(upper.Value, upperBound);
-
-            int expansion_steps = 0;
-            while ((expansion_steps < maxExpansionSteps) && (upper.Value < middle.Value || lower.Value < middle.Value))
-            {
-                if (lower.Value < middle.Value)
-                {
-                    lowerBound = 0.5*(upperBound + lowerBound) - lowerExpansionFactor*0.5*(upperBound - lowerBound);
-                    lower = objective.Evaluate(lowerBound);
-                }
-
-                if (upper.Value < middle.Value)
-                {
-                    upperBound = 0.5*(upperBound + lowerBound) + upperExpansionFactor*0.5*(upperBound - lowerBound);
-                    upper = objective.Evaluate(upperBound);
-                }
-
-                middlePointX = lowerBound + (upperBound - lowerBound)/(1 + Constants.GoldenRatio);
-                middle = objective.Evaluate(middlePointX);
-
-                expansion_steps += 1;
-            }
-
-            if (upper.Value < middle.Value || lower.Value < middle.Value)
-            {
-                throw new OptimizationException("Lower and upper bounds do not necessarily bound a minimum.");
-            }
 
             int iterations = 0;
             while (Math.Abs(upper.Point - lower.Point) > xTolerance && iterations < maxIterations)
