@@ -193,7 +193,7 @@ Target "Prepare" DoNothing
 // BUILD, SIGN, COLLECT
 // --------------------------------------------------------------------------------------
 
-let fingerprint = "5dbea70701b40cab1b2ca62c75401342b4f0f03a"
+let fingerprint = "490408de3618bed0a28e68dc5face46e5a3a97dd"
 let timeserver = "http://time.certum.pl/"
 
 Target "Build" (fun _ ->
@@ -222,7 +222,7 @@ Target "Build" (fun _ ->
         collectNuGetPackages numericsSolution
 
     // NuGet Sign (all or nothing)
-    if isWindows && hasBuildParam "sign" then signNuGet fingerprint timeserver numericsSolution
+    if isWindows && hasBuildParam "sign" then signNuGet fingerprint timeserver [numericsSolution]
 
     )
 "Prepare" ==> "Build"
@@ -255,7 +255,7 @@ Target "DataBuild" (fun _ ->
         collectNuGetPackages dataSolution
 
     // NuGet Sign (all or nothing)
-    if isWindows && hasBuildParam "sign" then signNuGet fingerprint timeserver dataSolution
+    if isWindows && hasBuildParam "sign" then signNuGet fingerprint timeserver [dataSolution]
 
     )
 "Prepare" ==> "DataBuild"
@@ -271,7 +271,7 @@ Target "MklWinBuild" (fun _ ->
     nugetPackManually mklSolution [ mklWinPack; mklWin32Pack; mklWin64Pack ]
 
     // NuGet Sign (all or nothing)
-    if isWindows && hasBuildParam "sign" then signNuGet fingerprint timeserver mklSolution
+    if isWindows && hasBuildParam "sign" then signNuGet fingerprint timeserver [mklSolution]
 
     )
 "Prepare" ==> "MklWinBuild"
@@ -286,7 +286,7 @@ Target "CudaWinBuild" (fun _ ->
     nugetPackManually cudaSolution [ cudaWinPack ]
 
     // NuGet Sign (all or nothing)
-    if isWindows && hasBuildParam "sign" then signNuGet fingerprint timeserver cudaSolution
+    if isWindows && hasBuildParam "sign" then signNuGet fingerprint timeserver [cudaSolution]
 
     )
 "Prepare" ==> "CudaWinBuild"
@@ -302,7 +302,7 @@ Target "OpenBlasWinBuild" (fun _ ->
     nugetPackManually openBlasSolution [ openBlasWinPack ]
 
     // NuGet Sign (all or nothing)
-    if isWindows && hasBuildParam "sign" then signNuGet fingerprint timeserver openBlasSolution
+    if isWindows && hasBuildParam "sign" then signNuGet fingerprint timeserver [openBlasSolution]
 
     )
 "Prepare" ==> "OpenBlasWinBuild"
@@ -314,27 +314,23 @@ Target "OpenBlasWinBuild" (fun _ ->
 
 let testNumerics framework = test "src/Numerics.Tests" "Numerics.Tests.csproj" framework
 Target "TestNumerics" DoNothing
-Target "TestNumericsCore1.1" (fun _ -> testNumerics "netcoreapp1.1")
-Target "TestNumericsCore2.0" (fun _ -> testNumerics "netcoreapp2.0")
+Target "TestNumericsCore2.1" (fun _ -> testNumerics "netcoreapp2.1")
 Target "TestNumericsNET40" (fun _ -> testNumerics "net40")
 Target "TestNumericsNET45" (fun _ -> testNumerics "net45")
 Target "TestNumericsNET461" (fun _ -> testNumerics "net461")
 Target "TestNumericsNET47"  (fun _ -> testNumerics "net47")
-"Build" ==> "TestNumericsCore1.1"
-"Build" ==> "TestNumericsCore2.0" ==> "TestNumerics"
+"Build" ==> "TestNumericsCore2.1" ==> "TestNumerics"
 "Build" =?> ("TestNumericsNET40", isWindows)
 "Build" =?> ("TestNumericsNET45", isWindows)
 "Build" =?> ("TestNumericsNET461", isWindows) ==> "TestNumerics"
 "Build" =?> ("TestNumericsNET47", isWindows)
 let testFsharp framework = test "src/FSharp.Tests" "FSharp.Tests.fsproj" framework
 Target "TestFsharp" DoNothing
-Target "TestFsharpCore1.1" (fun _ -> testFsharp "netcoreapp1.1")
-Target "TestFsharpCore2.0" (fun _ -> testFsharp "netcoreapp2.0")
+Target "TestFsharpCore2.1" (fun _ -> testFsharp "netcoreapp2.1")
 Target "TestFsharpNET45" (fun _ -> testFsharp "net45")
 Target "TestFsharpNET461" (fun _ -> testFsharp "net461")
 Target "TestFsharpNET47" (fun _ -> testFsharp "net47")
-"Build" ==> "TestFsharpCore1.1"
-"Build" ==> "TestFsharpCore2.0" ==> "TestFsharp"
+"Build" ==> "TestFsharpCore2.1" ==> "TestFsharp"
 "Build" =?> ("TestFsharpNET45", isWindows)
 "Build" =?> ("TestFsharpNET461", isWindows) ==> "TestFsharp"
 "Build" =?> ("TestFsharpNET47", isWindows)
@@ -344,32 +340,30 @@ Target "Test" DoNothing
 
 let testMKL framework = test "src/Numerics.Tests" "Numerics.Tests.MKL.csproj" framework
 Target "MklTest" DoNothing
-Target "MklTestCore2.0" (fun _ -> testMKL "netcoreapp2.0")
+Target "MklTestCore2.1" (fun _ -> testMKL "netcoreapp2.1")
 Target "MklTestNET40" (fun _ -> testMKL "net40")
-"MklWinBuild" ==> "MklTestCore2.0" ==> "MklTest"
+"MklWinBuild" ==> "MklTestCore2.1" ==> "MklTest"
 "MklWinBuild" =?> ("MklTestNET40", isWindows) ==> "MklTest"
 
 let testOpenBLAS framework = test "src/Numerics.Tests" "Numerics.Tests.OpenBLAS.csproj" framework
 Target "OpenBlasTest" DoNothing
-Target "OpenBlasTestCore2.0" (fun _ -> testOpenBLAS "netcoreapp2.0")
+Target "OpenBlasTestCore2.1" (fun _ -> testOpenBLAS "netcoreapp2.1")
 Target "OpenBlasTestNET40" (fun _ -> testOpenBLAS "net40")
-"OpenBlasWinBuild" ==> "OpenBlasTestCore2.0" ==> "OpenBlasTest"
+"OpenBlasWinBuild" ==> "OpenBlasTestCore2.1" ==> "OpenBlasTest"
 "OpenBlasWinBuild" =?> ("OpenBlasTestNET40", isWindows) ==> "OpenBlasTest"
 
 let testCUDA framework = test "src/Numerics.Tests" "Numerics.Tests.CUDA.csproj" framework
 Target "CudaTest" DoNothing
-Target "CudaTestCore2.0" (fun _ -> testCUDA "netcoreapp2.0")
+Target "CudaTestCore2.1" (fun _ -> testCUDA "netcoreapp2.1")
 Target "CudaTestNET40" (fun _ -> testCUDA "net40")
-"CudaWinBuild" ==> "CudaTestCore2.0" ==> "CudaTest"
+"CudaWinBuild" ==> "CudaTestCore2.1" ==> "CudaTest"
 "CudaWinBuild" =?> ("CudaTestNET40", isWindows) ==> "CudaTest"
 
 let testData framework = test "src/Data.Tests" "Data.Tests.csproj" framework
 Target "DataTest" DoNothing
-Target "DataTestCore1.1" (fun _ -> testData "netcoreapp1.1")
-Target "DataTestCore2.0" (fun _ -> testData "netcoreapp2.0")
+Target "DataTestCore2.1" (fun _ -> testData "netcoreapp2.1")
 Target "DataTestNET45" (fun _ -> testData "net45")
-"DataBuild" ==> "DataTestCore1.1"
-"DataBuild" ==> "DataTestCore2.0" ==> "DataTest"
+"DataBuild" ==> "DataTestCore2.1" ==> "DataTest"
 "DataBuild" =?> ("DataTestNET45", isWindows) ==> "DataTest"
 
 
@@ -461,17 +455,17 @@ Target "PublishMirrors" (fun _ -> publishMirrors ())
 Target "PublishDocs" (fun _ -> publishDocs numericsRelease)
 Target "PublishApi" (fun _ -> publishApi numericsRelease)
 
-Target "PublishArchive" (fun _ -> publishArchive numericsSolution)
-Target "DataPublishArchive" (fun _ -> publishArchive dataSolution)
-Target "MklPublishArchive" (fun _ -> publishArchive mklSolution)
-Target "CudaPublishArchive" (fun _ -> publishArchive cudaSolution)
-Target "OpenBlasPublishArchive" (fun _ -> publishArchive openBlasSolution)
+Target "PublishArchive" (fun _ -> publishArchives [numericsSolution])
+Target "DataPublishArchive" (fun _ -> publishArchives [dataSolution])
+Target "MklPublishArchive" (fun _ -> publishArchives [mklSolution])
+Target "CudaPublishArchive" (fun _ -> publishArchives [cudaSolution])
+Target "OpenBlasPublishArchive" (fun _ -> publishArchives [openBlasSolution])
 
-Target "PublishNuGet" (fun _ -> publishNuGet !! (numericsSolution.OutputNuGetDir </> "/*.nupkg"))
-Target "DataPublishNuGet" (fun _ -> publishNuGet !! (dataSolution.OutputNuGetDir </> "/*.nupkg"))
-Target "MklPublishNuGet" (fun _ -> publishNuGet !! (mklSolution.OutputNuGetDir </> "/*.nupkg"))
-Target "CudaPublishNuGet" (fun _ -> publishNuGet !! (cudaSolution.OutputNuGetDir </> "/*.nupkg"))
-Target "OpenBlasPublishNuGet" (fun _ -> publishNuGet !! (openBlasSolution.OutputNuGetDir </> "/*.nupkg"))
+Target "PublishNuGet" (fun _ -> publishNuGet [numericsSolution])
+Target "DataPublishNuGet" (fun _ -> publishNuGet [dataSolution])
+Target "MklPublishNuGet" (fun _ -> publishNuGet [mklSolution])
+Target "CudaPublishNuGet" (fun _ -> publishNuGet [cudaSolution])
+Target "OpenBlasPublishNuGet" (fun _ -> publishNuGet [openBlasSolution])
 
 Target "Publish" DoNothing
 Dependencies "Publish" [ "PublishTag"; "PublishDocs"; "PublishApi"; "PublishArchive"; "PublishNuGet" ]

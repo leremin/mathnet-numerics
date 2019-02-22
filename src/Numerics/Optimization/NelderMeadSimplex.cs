@@ -29,8 +29,8 @@
 
 // Converted from code released with a MIT license available at https://code.google.com/p/nelder-mead-simplex/
 
-using MathNet.Numerics.LinearAlgebra;
 using System;
+using MathNet.Numerics.LinearAlgebra;
 
 namespace MathNet.Numerics.Optimization
 {
@@ -108,13 +108,13 @@ namespace MathNet.Numerics.Optimization
         {
             // confirm that we are in a position to commence
             if (objectiveFunction == null)
-                throw new ArgumentNullException("objectiveFunction","ObjectiveFunction must be set to a valid ObjectiveFunctionDelegate");
+                throw new ArgumentNullException(nameof(objectiveFunction),"ObjectiveFunction must be set to a valid ObjectiveFunctionDelegate");
 
             if (initialGuess == null)
-                throw new ArgumentNullException("initialGuess", "initialGuess must be initialized");
+                throw new ArgumentNullException(nameof(initialGuess), "initialGuess must be initialized");
 
             if (initalPertubation == null)
-                throw new ArgumentNullException("initalPertubation", "initalPertubation must be initialized, if unknown use overloaded version of FindMinimum()");
+                throw new ArgumentNullException(nameof(initalPertubation), "initalPertubation must be initialized, if unknown use overloaded version of FindMinimum()");
 
             SimplexConstant[] simplexConstants = SimplexConstant.CreateSimplexConstantsFromVectors(initialGuess,initalPertubation);
 
