@@ -13,7 +13,7 @@ Math.NET Numerics is covered under the terms of the [MIT/X11](LICENSE.md) licens
 * [Source Code](https://github.com/mathnet/mathnet-numerics)
 * [NuGet & Binaries](https://numerics.mathdotnet.com/Packages.html) | [Release Notes](https://numerics.mathdotnet.com/ReleaseNotes.html)
 * [Documentation](https://numerics.mathdotnet.com) | [API Reference](https://numerics.mathdotnet.com/api/)
-* [Issues & Bugs](https://github.com/mathnet/mathnet-numerics/issues) | [Ideas](http://feedback.mathdotnet.com/forums/2060-math-net-numerics)
+* [Issues & Bugs](https://github.com/mathnet/mathnet-numerics/issues) | [Ideas](https://feedback.mathdotnet.com/forums/2060-math-net-numerics)
 * [Discussions](https://discuss.mathdotnet.com/c/numerics) | [Stack Overflow](https://stackoverflow.com/questions/tagged/mathdotnet) | [Twitter](https://twitter.com/MathDotNet)
 * [Wikipedia](https://en.wikipedia.org/wiki/Math.NET_Numerics) | [OpenHUB](https://www.openhub.net/p/mathnet-numerics)
 
@@ -63,7 +63,7 @@ For full details, dependencies and platform discrepancies see [Platform Compatib
 Building Math.NET Numerics
 --------------------------
 
-Windows (.Net): [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/79j22c061saisces/branch/master)](https://ci.appveyor.com/project/cdrnet/mathnet-numerics) [![Build Status](https://dev.azure.com/mathdotnet/Math.NET%20Build/_apis/build/status/Math.NET%20Numerics?branchName=master)](https://dev.azure.com/mathdotnet/Math.NET%20Build/_build/latest?definitionId=1&branchName=master)  
+Windows (.Net): [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/79j22c061saisces/branch/master)](https://ci.appveyor.com/project/cdrnet/mathnet-numerics)  
 Linux (Mono): [![Travis Build Status](https://travis-ci.org/mathnet/mathnet-numerics.svg?branch=master)](https://travis-ci.org/mathnet/mathnet-numerics)
 
 You can build Math.NET Numerics with an IDE like VisualStudio or JetBrains Rider, with MsBuild, .Net CLI tools or with FAKE (recommended).

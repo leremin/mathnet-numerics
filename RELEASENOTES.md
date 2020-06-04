@@ -1,6 +1,23 @@
+### 4.11.0 - 2020-05-24
+* Distributions: Skewed Generalized T and Error distributions *~Mikael Ohman*
+* BUG: Linear Algebra: fix Moore-Penrose Pseudo-Inverse for complex matrices *~Alex Hildebrand*
+* BUG: Linear Algebra: fix range in non-square diagonal sparse mixed products
+
+### 4.10.0 - 2020-05-24
+* Fractional Calculus: Riemann-Liouville fractional derivative *~Jong Hyun Kim*
+* Root Finding: accuracy range validation *~Ryan Grange*
+* Root Finding: behavior more consistent between native and managed provider
+
+### 4.9.1 - 2020-04-12
+* BUG: Optimization: weights were applied wrongly when evaluating the Jacobian *~Jong Hyun Kim, zhaochenxi*
+* BUG: Linear Algebra: F# Matrix.reduceRows was reducing columns instead of rows *~kayanme*
+* BUG: Distributions: Hypergeometric.CDF no longer returns values > 1.0 *~Manor Askenazi*
+* Documentation: fix missing logarithms, drop old links *~Michel de Ruiter, Guney Ozsan*
+* Build: no longer code-sign the assemblies with a code-signing certificate, since it is too painful.
+
 ### 4.9.0 - 2019-10-13
 * Integration: Substitution for open intervals *~Jong Hyun Kim*
-* Integration: Gaus-Kronrod Quadrature *~Jong Hyun Kim*
+* Integration: Gauss-Kronrod Quadrature *~Jong Hyun Kim*
 * Integration: Complex contour *~Jong Hyun Kim*
 * Distributions: Three parameter Burr (Type XII) *~Philip Gruber*
 * Distributions: Inverse Gaussian *~Philip Gruber*
@@ -430,7 +447,7 @@
 * Update Vagrant setup to official Ubuntu 14.04 LTS box and proper apt-style Mono+F# provisioning.
 
 ### 3.0.0-beta01 - 2014-04-01
-* See also: [Roadmap](https://sdrv.ms/17wPFlW) and [Towards Math.NET Numerics Version 3](http://christoph.ruegg.name/blog/towards-mathnet-numerics-v3.html).
+* See also: [Roadmap](https://sdrv.ms/17wPFlW) and [Towards Math.NET Numerics Version 3](https://christoph.ruegg.name/blog/towards-mathnet-numerics-v3.html).
 * **Major release with breaking changes**
 * All obsolete code has been removed
 * Reworked redundancies, inconsistencies and unfortunate past design choices.
@@ -578,7 +595,7 @@
 * BUG: fixing a bug in `ArrayStatistics.Variance` on arrays longer than 46341 entries.
 
 ### 2.6.0 - 2013-07-26
-* See also: [What's New in Math.NET Numerics 2.6](http://christoph.ruegg.name/blog/new-in-mathnet-numerics-2-6.html)
+* See also: [What's New in Math.NET Numerics 2.6](https://christoph.ruegg.name/blog/new-in-mathnet-numerics-2-6.html)
 * Linear Curve Fitting: Linear least-squares fitting (regression) to lines, polynomials and linear combinations of arbitrary functions. Multi-dimensional fitting. Also works well in F# with the F# extensions.
 * Root Finding:
    * Brent's method. *~Candy Chiu, Alexander Täschner*
@@ -610,7 +627,7 @@
 * Repository now Vagrant-ready for easy testing against recent Mono on Debian.
 
 ### 2.5.0 - 2013-04-14
-* See also: [What's New in Math.NET Numerics 2.5](http://christoph.ruegg.name/blog/new-in-mathnet-numerics-2-5.html)
+* See also: [What's New in Math.NET Numerics 2.5](https://christoph.ruegg.name/blog/new-in-mathnet-numerics-2-5.html)
 * Statistics: Empty statistics now return NaN instead of either 0 or throwing an exception. *This may break code in case you relied upon the previous unusual and inconsistent behavior.*
 * Linear Algebra: More reasonable ToString behavior for matrices and vectors. *This may break code if you relied upon ToString to export your full data to text form intended to be parsed again later. Note that the classes in the MathNet.Numerics.IO library are more appropriate for storing and loading data.*
 * Statistics:

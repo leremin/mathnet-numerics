@@ -5,80 +5,72 @@ If you do not want to use the official binaries, or if you like to modify,
 debug or contribute, you can compile locally either using Visual Studio or
 manually with the build scripts.
 
-VisualStudio or Xamarin Studio
-------------------------------
+System Requirements
+-------------------
 
-We clearly separate dependency management from the IDE, you should therefore
+* .NET Core SDK 3.1.1 ([download](https://dotnet.microsoft.com/download/dotnet-core/3.1))
+
+VisualStudio and other IDEs
+---------------------------
+
+We clearly separate dependency management from the IDE and therefore recommend to
 run `restore.cmd` or `restore.sh` once after every git checkout in order to restore
 the dependencies exactly as defined. Otherwise Visual Studio and other IDEs
 may fail to compile or provide correct IntelliSense.
 
 Tests can be run with the usual integrated NUnit test runners or ReSharper.
 
-MSBuild or XBuild
------------------
+Command Line Tools
+------------------
 
 Instead of a compatible IDE you can also build the solutions directly with
-`msbuild`, or on Mono with `xbuild`. You may need to run `restore.cmd` or
-`restore.sh` before, once after every git checkout in order to restore the dependencies.
+the .NET Core SDK build tools. You may need to run `restore.cmd` or `restore.sh`
+before, once after every git checkout in order to restore the dependencies.
 
-	restore.cmd (or restore.sh)             # restore dependencies (once)
-    msbuild MathNet.Numerics.sln            # only build for .Net 4 (main solution)
-    msbuild MathNet.Numerics.Net35Only.sln  # only build for .Net 3.5
-    msbuild MathNet.Numerics.All.sln        # full build with .Net 4, 3.5 and PCL profiles
-    xbuild MathNet.Numerics.sln             # build with Mono, e.g. on Linux or Mac
+    restore.cmd (or ./restore.sh)
+    dotnet build MathNet.Numerics.sln
 
 FAKE
 ----
 
 The fully automated build including unit tests, documentation and api
-reference, NuGet and Zip packages is using [FAKE](http://fsharp.github.io/FAKE/).
+reference, NuGet and Zip packages is using [FAKE](https://fsharp.github.io/FAKE/).
 
 FAKE itself is not included in the repository but it will download and bootstrap
 itself automatically when build.cmd is run the first time. Note that this step
-is *not* required when using Visual Studio or `msbuild` directly.
+is *not* required when using Visual Studio or the .NET Core SDK directly.
 
-    build.cmd    # normal build (.Net 4.0), run unit tests (.Net on Windows)
-    ./build.sh   # normal build (.Net 4.0), run unit tests (Mono on Linux/Mac, .Net on Windows)
+    ./build.sh   # normal build and unit tests, when using bash shell on Windows or Linux.
+    build.cmd    # normal build and unit tests, when using Windows CMD shell.
 
-    build.cmd Build              # normal build (.Net 4.0)
-    build.cmd Build incremental  # normal build, incremental (.Net 4.0)
-    build.cmd Build all          # full build (.Net 4.0, 3.5, PCL)
-    build.cmd Build net35        # compatibility build (.Net 3.5
-    build.cmd Build signed       # normal build, signed/strong named (.Net 4.0)
+    ./build.sh build              # normal build
+    ./build.sh build strongname   # normal build and also build strong-named variant
 
-    build.cmd Test          # normal build (.Net 4.0), run unit tests
-    build.cmd Test quick    # normal build (.Net 4.0), run unit tests except long running ones
-    build.cmd Test all      # full build (.Net 4.0, 3.5, PCL), run all unit tests
-    build.cmd Test net35    # compatibility build (.Net 3.5), run unit tests
+    ./build.sh test          # normal build, run unit tests
+    ./build.sh test quick    # normal build, run unit tests except long running ones
 
-    build.cmd Clean         # cleanup build artifacts
-    build.cmd Docs          # generate documentation
-    build.cmd Api           # generate api reference
-    build.cmd Zip           # generate zip packages (.Net 4.0)
-    build.cmd NuGet         # generate NuGet packages (.Net 4.0)
-    build.cmd NuGet all     # generate normal NuGet packages (.Net 4.0, 3.5, PCL)
-    build.cmd NuGet signed  # generate signed/strong named NuGet packages (.Net 4.0)
+    ./build.sh clean         # cleanup build artifacts
+    ./build.sh docs          # generate documentation
+    ./build.sh api           # generate api reference
 
-    build.cmd All           # build, test, docs, api reference (.Net 4.0)
+    ./build.sh all           # build, test, docs, api reference
 
 If the build or tests fail claiming that FSharp.Core was not be found, see
-[fsharp.org](http://fsharp.org/use/windows/) or install the
+[fsharp.org](https://fsharp.org/use/windows/) or install the
 [Visual F# 3.0 Tools](https://go.microsoft.com/fwlink/?LinkId=261286) directly.
 
 Dependencies
 ------------
 
-We manage NuGet and other dependencies with [Paket](http://fsprojects.github.io/Paket/).
+We manage NuGet and other dependencies with [Paket](https://fsprojects.github.io/Paket/).
 You do not normally have to do anything with Paket as it is integrated into our
 FAKE build tools, unless you want to actively manage the dependencies.
 
-You can bootstrap or update Paket by calling `tools/paket/paket.bootstrapper.exe`.
-After bootstrapping, `tools/paket/paket.exe restore` will restore the packages
+`.paket/paket.exe restore` will restore the packages
 to the exact version specified in the `paket.lock` file,
-`tools/paket/paket.exe install` will install or migrate packages after you have
-made changes to the `paket.dependencies` file, `tools/paket/paket.exe outdated`
-will show whether any packages are out of date and `tools/paket/paket.exe update`
+`.paket/paket.exe install` will install or migrate packages after you have
+made changes to the `paket.dependencies` file, `.paket/paket.exe outdated`
+will show whether any packages are out of date and `.paket/paket.exe update`
 will update all packages within the defined constraints. Have a look at the Paket
 website for more commands and details.
 
@@ -86,9 +78,9 @@ Documentation
 -------------
 
 This website and documentation is automatically generated from of a set of
-[CommonMark](http://commonmark.org/) structured files in `doc/content/` using
-[FSharp.Formatting](http://tpetricek.github.io/FSharp.Formatting/).
-The final documentation can be built by calling `build.sh Docs`.
+[CommonMark](https://commonmark.org/) structured files in `doc/content/` using
+[FSharp.Formatting](https://tpetricek.github.io/FSharp.Formatting/).
+The final documentation can be built by calling `build.sh docs`.
 
 However, for editing and previewing the docs on your local machine it is more
 convenient to run `build.sh DocsWatch` in a separate console instead, which
@@ -112,9 +104,7 @@ to the assembly info files automatically.
 
 The build can then be launched by calling:
 
-    build.sh All release    # full release build
-    build.sh NuGet release  # if you only need NuGet packages
-    build.sh Zip release    # if you only need Zip packages
+    ./build.sh all
 
 The build script will print the current version as part of the the header banner,
 which is also included in the release notes document in the build artifacts.
@@ -140,13 +130,37 @@ Extra Packages
 --------------
 
 In addition to the core package this repository also include extra packages
-like the MKL provider and the data extensions. Most build targets are available for
+like the data extensions. Most build targets are available for
 these packages as well, with the following prefixes:
 
-*   `Mkl` for the MKL provider (`MklWin` or `MklLinux` if platform dependent)
 *   `Data` for the Data Extensions
 
-Example: `build.sh MklWinNuget release`
+Example: `build.sh DataBuild`
+
+Intel MKL on Windows
+--------------------
+
+Building the Intel MKL native provider for Windows requires additionally:
+
+* Either Intel Parallel Studio 2020 or Intel Math Kernel Library 2020 is installed
+* Visual Studio 2019, with the following options
+    * Desktop development with C++ workload
+    * Windows 10 SDK (10.0.17763.0)
+    * MSVC v142 - VS 2019 C++ x64/x86 build tools
+
+The build can then be triggered by calling:
+
+    ./build.sh MklWinBuild  // build both 32 and 64 bit variants
+    ./build.sh MklTest      // run all tests with the MKL provider enforced
+    ./build.sh MklWinAll    // build and run tests
+
+If you run into an error with `mkl_link_tool.exe` you may need to patch a targets file,
+see [MKL 2020.1, VS2019 linking bug ](https://software.intel.com/en-us/forums/intel-math-kernel-library/topic/851578).
+
+The build puts the binaries to `out/MKL/Windows/x64` (and `x86`), the NuGet package
+to `out/MKL/NuGet` and a Zip archive to `out/MKL/Zip`. You can directly use the provider from
+there by setting `Control.NativeProviderPath` to the full path pointing to `out/MKL/Windows/`;
+this is also what the unit tests do when you run the `MklTest` build target.
 
 Official Release Process (Maintainers only)
 -------------------------------------------
@@ -156,7 +170,7 @@ Official Release Process (Maintainers only)
 
 *   Build Release:
 
-        build.sh All release
+        build.sh all strongname
 
 *   Commit and push release notes and (auto-updated) assembly info files with new "Release: v1.2.3" commit
 
@@ -165,16 +179,10 @@ Official Release Process (Maintainers only)
         build.sh PublishDocs
         build.sh PublishApi
         build.sh PublishTag
-        build.sh PublishMirrors
+        build.sh PublishArchive
         build.sh PublishNuGet
 
-    In theory there is also a `Publish` target to do this in one step, unfortunately
-    publishing to the NuGet gallery is quite unreliable.
-
-*   Create new GitHub release, attach Zip files (to be automated)
-*   Copy artifacts to [release archive](https://1drv.ms/1lMtdNi) (to be automated)
 *   Consider a tweet via [@MathDotNet](https://twitter.com/MathDotNet)
-*   Consider a post to the [Google+ site](https://plus.google.com/112484567926928665204)
 *   Update Wikipedia release version and date for the
     [Math.NET Numerics](https://en.wikipedia.org/wiki/Math.NET_Numerics) and
     [Comparison of numerical analysis software](https://en.wikipedia.org/wiki/Comparison_of_numerical_analysis_software) articles.

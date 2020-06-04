@@ -31,58 +31,12 @@ trace rootDir
 // .Net SDK
 // --------------------------------------------------------------------------------------
 
-let msbuild targets configuration project =
-    let properties =
-        [
-            yield "Configuration", configuration
-        ]
-    MSBuildHelper.build (fun p ->
-        { p with
-            NoLogo = true
-            NodeReuse = false
-            Targets = targets
-            Properties = properties
-            RestorePackagesFlag = false
-            Verbosity = Some MSBuildVerbosity.Minimal
-        }) project
-
-let msbuildWeak targets configuration project =
-    let properties =
-        [
-            yield "Configuration", configuration
-            yield "StrongName", "False"
-        ]
-    MSBuildHelper.build (fun p ->
-        { p with
-            NoLogo = true
-            NodeReuse = false
-            Targets = targets
-            Properties = properties
-            RestorePackagesFlag = false
-            Verbosity = Some MSBuildVerbosity.Minimal
-        }) project
-
-let msbuildStrong targets configuration project =
-    let properties =
-        [
-            yield "Configuration", configuration
-            yield "StrongName", "True"
-        ]
-    MSBuildHelper.build (fun p ->
-        { p with
-            NoLogo = true
-            NodeReuse = false
-            Targets = targets
-            Properties = properties
-            RestorePackagesFlag = false
-            Verbosity = Some MSBuildVerbosity.Minimal
-        }) project
 
 let dotnet workingDir command =
     let properties =
         [
         ]
-    let suffix = properties |> List.map (fun (name, value) -> sprintf """ /p:%s="%s" """ name value) |> String.concat ""
+    let suffix = properties |> List.map (fun (name, value) -> sprintf """ /p:%s="%s" /nr:false """ name value) |> String.concat ""
     DotNetCli.RunCommand
         (fun c -> { c with WorkingDir = workingDir})
         (command + suffix)
@@ -92,9 +46,9 @@ let dotnetWeak workingDir command =
         [
             yield "StrongName", "False"
         ]
-    let suffix = properties |> List.map (fun (name, value) -> sprintf """ /p:%s="%s" """ name value) |> String.concat ""
+    let suffix = properties |> List.map (fun (name, value) -> sprintf """ /p:%s="%s" /nr:false """ name value) |> String.concat ""
     DotNetCli.RunCommand
-        (fun c -> { c with WorkingDir = workingDir})
+        (fun c -> { c with WorkingDir = workingDir })
         (command + suffix)
 
 let dotnetStrong workingDir command =
@@ -102,7 +56,7 @@ let dotnetStrong workingDir command =
         [
             yield "StrongName", "True"
         ]
-    let suffix = properties |> List.map (fun (name, value) -> sprintf """ /p:%s="%s" """ name value) |> String.concat ""
+    let suffix = properties |> List.map (fun (name, value) -> sprintf """ /p:%s="%s" /nr:false """ name value) |> String.concat ""
     DotNetCli.RunCommand
         (fun c -> { c with WorkingDir = workingDir})
         (command + suffix)
@@ -296,7 +250,7 @@ let patchVersionInProjectFile (project:Project) =
             >> regex_replace """\<FileVersion\>.*\</FileVersion\>""" (sprintf """<FileVersion>%s</FileVersion>""" p.Release.AssemblyVersion)
             >> regex_replace """\<VersionPrefix\>.*\</VersionPrefix\>""" (sprintf """<VersionPrefix>%s</VersionPrefix>""" prefix)
             >> regex_replace """\<VersionSuffix\>.*\</VersionSuffix\>""" (sprintf """<VersionSuffix>%s</VersionSuffix>""" suffix)
-            >> regex_replace_singleline """\<PackageReleaseNotes\>.*\</PackageReleaseNotes\>""" (sprintf """<PackageReleaseNotes>%s</PackageReleaseNotes>""" p.Release.ReleaseNotes))
+            >> regex_replace_singleline """\<PackageReleaseNotes\>.*\</PackageReleaseNotes\>""" (sprintf """<PackageReleaseNotes>%s</PackageReleaseNotes>""" (p.Release.ReleaseNotes.Replace("<","&lt;").Replace(">","&gt;"))))
             p.ProjectFile
     | NativeVisualStudio _ -> ()
     | NativeBashScript _ -> ()
@@ -306,16 +260,16 @@ let patchVersionInProjectFile (project:Project) =
 // BUILD
 // --------------------------------------------------------------------------------------
 
-let clean (solution:Solution) = msbuild [ "Clean" ] "Release" solution.SolutionFile
+let clean (solution:Solution) = dotnet rootDir (sprintf "clean %s --configuration Release --verbosity minimal" solution.SolutionFile)
 
-let restoreWeak (solution:Solution) = msbuildWeak [ "Restore" ] "Release" solution.SolutionFile
-let restoreStrong (solution:Solution) = msbuildStrong [ "Restore" ] "Release" solution.SolutionFile
+let restoreWeak (solution:Solution) = dotnetWeak rootDir (sprintf "restore %s --verbosity minimal" solution.SolutionFile)
+let restoreStrong (solution:Solution) = dotnetStrong rootDir (sprintf "restore %s --verbosity minimal" solution.SolutionFile)
 
-let buildWeak (solution:Solution) = msbuildWeak [ (if hasBuildParam "incremental" then "Build" else "Rebuild") ] "Release" solution.SolutionFile
-let buildStrong (solution:Solution) = msbuildStrong [ (if hasBuildParam "incremental" then "Build" else "Rebuild") ] "Release" solution.SolutionFile
+let buildWeak (solution:Solution) = dotnetWeak rootDir (sprintf "build %s --configuration Release --no-incremental --no-restore --verbosity minimal" solution.SolutionFile)
+let buildStrong (solution:Solution) = dotnetStrong rootDir (sprintf "build %s --configuration Release --no-incremental --no-restore --verbosity minimal" solution.SolutionFile)
 
-let packWeak (solution:Solution) = dotnetWeak rootDir (sprintf "pack %s --configuration Release --no-restore --no-build" solution.SolutionFile)
-let packStrong (solution:Solution) = dotnetStrong rootDir (sprintf "pack %s --configuration Release --no-restore --no-build" solution.SolutionFile)
+let packWeak (solution:Solution) = dotnetWeak rootDir (sprintf "pack %s --configuration Release --no-restore --verbosity minimal" solution.SolutionFile)
+let packStrong (solution:Solution) = dotnetStrong rootDir (sprintf "pack %s --configuration Release --no-restore --verbosity minimal" solution.SolutionFile)
 
 let packProjectWeak = function
     | VisualStudio p -> dotnetWeak rootDir (sprintf "pack %s --configuration Release --no-restore --no-build" p.ProjectFile)

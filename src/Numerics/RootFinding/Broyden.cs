@@ -3,7 +3,7 @@
 // http://numerics.mathdotnet.com
 // http://github.com/mathnet/mathnet-numerics
 //
-// Copyright (c) 2009-2013 Math.NET
+// Copyright (c) 2009-2020 Math.NET
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -43,7 +43,7 @@ namespace MathNet.Numerics.RootFinding
         /// <summary>Find a solution of the equation f(x)=0.</summary>
         /// <param name="f">The function to find roots from.</param>
         /// <param name="initialGuess">Initial guess of the root.</param>
-        /// <param name="accuracy">Desired accuracy. The root will be refined until the accuracy or the maximum number of iterations is reached. Default 1e-8.</param>
+        /// <param name="accuracy">Desired accuracy. The root will be refined until the accuracy or the maximum number of iterations is reached. Default 1e-8. Must be greater than 0.</param>
         /// <param name="maxIterations">Maximum number of iterations. Default 100.</param>
         /// <param name="jacobianStepSize">Relative step size for calculating the Jacobian matrix at first step. Default 1.0e-4</param>
         /// <returns>Returns the root with the specified accuracy.</returns>
@@ -62,13 +62,18 @@ namespace MathNet.Numerics.RootFinding
         /// <summary>Find a solution of the equation f(x)=0.</summary>
         /// <param name="f">The function to find roots from.</param>
         /// <param name="initialGuess">Initial guess of the root.</param>
-        /// <param name="accuracy">Desired accuracy. The root will be refined until the accuracy or the maximum number of iterations is reached.</param>
+        /// <param name="accuracy">Desired accuracy. The root will be refined until the accuracy or the maximum number of iterations is reached. Must be greater than 0.</param>
         /// <param name="maxIterations">Maximum number of iterations. Usually 100.</param>
         /// <param name="jacobianStepSize">Relative step size for calculating the Jacobian matrix at first step.</param>
         /// <param name="root">The root that was found, if any. Undefined if the function returns false.</param>
         /// <returns>True if a root with the specified accuracy was found, else false.</returns>
         public static bool TryFindRootWithJacobianStep(Func<double[], double[]> f, double[] initialGuess, double accuracy, int maxIterations, double jacobianStepSize, out double[] root)
         {
+            if (accuracy <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(accuracy), "Must be greater than zero.");
+            }
+
             var x = new DenseVector(initialGuess);
 
             double[] y0 = f(initialGuess);
@@ -77,42 +82,50 @@ namespace MathNet.Numerics.RootFinding
 
             Matrix<double> B = CalculateApproximateJacobian(f, initialGuess, y0, jacobianStepSize);
 
-            for (int i = 0; i <= maxIterations; i++)
+            try
             {
-                var dx = (DenseVector) (-B.LU().Solve(y));
-                var xnew = x + dx;
-                var ynew = new DenseVector(f(xnew.Values));
-                double gnew = ynew.L2Norm();
-
-                if (gnew > g)
+                for (int i = 0; i <= maxIterations; i++)
                 {
-                    double g2 = g*g;
-                    double scale = g2/(g2 + gnew*gnew);
-                    if (scale == 0.0)
+                    var dx = (DenseVector) (-B.LU().Solve(y));
+                    var xnew = x + dx;
+                    var ynew = new DenseVector(f(xnew.Values));
+                    double gnew = ynew.L2Norm();
+
+                    if (gnew > g)
                     {
-                        scale = 1.0e-4;
+                        double g2 = g*g;
+                        double scale = g2/(g2 + gnew*gnew);
+                        if (scale == 0.0)
+                        {
+                            scale = 1.0e-4;
+                        }
+
+                        dx = scale*dx;
+                        xnew = x + dx;
+                        ynew = new DenseVector(f(xnew.Values));
+                        gnew = ynew.L2Norm();
                     }
 
-                    dx = scale*dx;
-                    xnew = x + dx;
-                    ynew = new DenseVector(f(xnew.Values));
-                    gnew = ynew.L2Norm();
+                    if (gnew < accuracy)
+                    {
+                        root = xnew.Values;
+                        return true;
+                    }
+
+                    // update Jacobian B
+                    DenseVector dF = ynew - y;
+                    Matrix<double> dB = (dF - B.Multiply(dx)).ToColumnMatrix() * dx.Multiply(1.0 / Math.Pow(dx.L2Norm(), 2)).ToRowMatrix();
+                    B = B + dB;
+
+                    x = xnew;
+                    y = ynew;
+                    g = gnew;
                 }
-
-                if (gnew < accuracy)
-                {
-                    root = xnew.Values;
-                    return true;
-                }
-
-                // update Jacobian B
-                DenseVector dF = ynew - y;
-                Matrix<double> dB = (dF - B.Multiply(dx)).ToColumnMatrix() * dx.Multiply(1.0 / Math.Pow(dx.L2Norm(), 2)).ToRowMatrix();
-                B = B + dB;
-
-                x = xnew;
-                y = ynew;
-                g = gnew;
+            }
+            catch (InvalidParameterException)
+            {
+                root = null;
+                return false;
             }
 
             root = null;
@@ -121,7 +134,7 @@ namespace MathNet.Numerics.RootFinding
         /// <summary>Find a solution of the equation f(x)=0.</summary>
         /// <param name="f">The function to find roots from.</param>
         /// <param name="initialGuess">Initial guess of the root.</param>
-        /// <param name="accuracy">Desired accuracy. The root will be refined until the accuracy or the maximum number of iterations is reached.</param>
+        /// <param name="accuracy">Desired accuracy. The root will be refined until the accuracy or the maximum number of iterations is reached. Must be greater than 0.</param>
         /// <param name="maxIterations">Maximum number of iterations. Usually 100.</param>
         /// <param name="root">The root that was found, if any. Undefined if the function returns false.</param>
         /// <returns>True if a root with the specified accuracy was found, else false.</returns>

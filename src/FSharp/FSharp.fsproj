@@ -7,23 +7,14 @@
     <RootNamespace>MathNet.Numerics</RootNamespace>
     <IsPackable>true</IsPackable>
     <PackageId>MathNet.Numerics.FSharp$(PackageIdSuffix)</PackageId>
-    <VersionPrefix>4.9.0</VersionPrefix>
+    <VersionPrefix>4.11.0</VersionPrefix>
     <VersionSuffix></VersionSuffix>
     <Title>Math.NET Numerics for F#$(TitleSuffix)</Title>
     <Description>F# Modules for Math.NET Numerics, the numerical foundation of the Math.NET project, aiming to provide methods and algorithms for numerical computations in science, engineering and every day use. Supports .Net Framework 4.5 or higher and .Net Standard 1.6 or higher, on Windows, Linux and Mac.$(DescriptionSuffix)</Description>
-    <PackageReleaseNotes>Integration: Substitution for open intervals ~Jong Hyun Kim
-Integration: Gaus-Kronrod Quadrature ~Jong Hyun Kim
-Integration: Complex contour ~Jong Hyun Kim
-Distributions: Three parameter Burr (Type XII) ~Philip Gruber
-Distributions: Inverse Gaussian ~Philip Gruber
-Distributions: Truncated Pareto ~Philip Gruber
-Optimization: Detect early completion in BFGS-B minimizer ~Tom McTiernan</PackageReleaseNotes>
+    <PackageReleaseNotes>Distributions: Skewed Generalized T and Error distributions ~Mikael Ohman
+BUG: Linear Algebra: fix Moore-Penrose Pseudo-Inverse for complex matrices ~Alex Hildebrand
+BUG: Linear Algebra: fix range in non-square diagonal sparse mixed products</PackageReleaseNotes>
     <PackageTags>fsharp F# math numeric statistics probability integration interpolation regression solve fit linear algebra matrix fft</PackageTags>
-    <IsTool>false</IsTool>
-    <NeutralLanguage>en</NeutralLanguage>
-    <NoPackageAnalysis>false</NoPackageAnalysis>
-    <IncludeBuildOutput>true</IncludeBuildOutput>
-    <IncludeContentInPack>false</IncludeContentInPack>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -51,8 +42,7 @@ Optimization: Detect early completion in BFGS-B minimizer ~Tom McTiernan</Packag
     <Compile Include="FindRoots.fs" />
     <Compile Include="RandomVariable.fs" />
     <Compile Include="Quaternion.fs" />
-    <None Include="MathNet.Numerics.fsx" />
-    <None Include="MathNet.Numerics.IfSharp.fsx" />
+    <None Include="paket.references" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>
